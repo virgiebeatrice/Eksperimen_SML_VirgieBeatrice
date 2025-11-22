@@ -77,3 +77,10 @@ def preprocess_dataset(raw_csv_path, output_csv_path, preprocess_path):
 
     print("Preprocessing completed successfully.")
     return processed_df
+
+if __name__ == "__main__":
+    preprocess_dataset(
+        raw_csv_path="GlobalRoadAccidents_raw/road_accident_dataset.csv",
+        output_csv_path="preprocessing/processed_dataset.csv",
+        preprocess_path="preprocessing/preprocessing_pipeline.pkl"
+    )
