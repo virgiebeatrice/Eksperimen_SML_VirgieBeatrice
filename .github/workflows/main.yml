@@ -34,7 +34,7 @@ jobs:
         uses: EndBug/add-and-commit@v9
         with:
           token: ${{ secrets.SECRET }}
-          add: "preprocessing/processed_data.csv"
+          add: "preprocessing/processed_dataset.csv"
           author_name: "github-actions[bot]"
           author_email: "github-actions[bot]@users.noreply.github.com"
           message: "Update pre-processed data"
