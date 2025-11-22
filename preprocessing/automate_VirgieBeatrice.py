@@ -1,9 +1,7 @@
 import pandas as pd
 import numpy as np
-from sklearn.preprocessing import StandardScaler
-from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler, OrdinalEncoder
 from sklearn.compose import ColumnTransformer
-from sklearn.preprocessing import OneHotEncoder
 from sklearn.pipeline import Pipeline
 import joblib
 
@@ -19,7 +17,14 @@ def build_preprocessing_pipeline(categorical_cols, numerical_cols):
     """Create ColumnTransformer for categorical + numerical preprocessing."""
     return ColumnTransformer(
         transformers=[
-            ("categorical", OneHotEncoder(handle_unknown="ignore"), categorical_cols),
+            (
+                "categorical",
+                OrdinalEncoder(
+                    handle_unknown="use_encoded_value",
+                    unknown_value=-1
+                ),
+                categorical_cols,
+            ),
             ("numerical", StandardScaler(), numerical_cols),
         ]
     )
@@ -36,6 +41,8 @@ def preprocess_dataset(raw_csv_path, output_csv_path, preprocess_path):
 
     # Define target
     target_col = "Accident Severity"
+    if target_col not in df.columns:
+        raise ValueError(f"Target column '{target_col}' not found in dataset.")
 
     # Feature groups
     categorical_cols = [
@@ -59,7 +66,6 @@ def preprocess_dataset(raw_csv_path, output_csv_path, preprocess_path):
     # Build preprocessing transformer
     preprocessor = build_preprocessing_pipeline(categorical_cols, numerical_cols)
 
-    # Pipeline for preprocessing only
     preprocessing_pipeline = Pipeline([
         ("preprocessor", preprocessor)
     ])
@@ -71,12 +77,13 @@ def preprocess_dataset(raw_csv_path, output_csv_path, preprocess_path):
     joblib.dump(preprocessing_pipeline, preprocess_path)
 
     print("Saving processed dataset...")
-    processed_df = pd.DataFrame(X_processed.toarray() if hasattr(X_processed, "toarray") else X_processed)
+    processed_df = pd.DataFrame(X_processed)
     processed_df[target_col] = y.values
     processed_df.to_csv(output_csv_path, index=False)
 
     print("Preprocessing completed successfully.")
     return processed_df
+
 
 if __name__ == "__main__":
     preprocess_dataset(
