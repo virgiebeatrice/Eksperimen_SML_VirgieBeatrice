@@ -1,0 +1,35 @@
+name: Automated Preprocessing
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  preprocess:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v3
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.12.7"
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run automate_VirgieBeatrice.py
+        run: |
+          python preprocessing/automate_VirgieBeatrice.py
+
+      - name: Upload Processed Dataset
+        uses: actions/upload-artifact@v4
+        with:
+          name: processed-dataset
+          path: preprocessing/processed_dataset.csv
